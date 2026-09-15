@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Photoautomat Booth</title>
+    <meta
+      name="description"
+      content="A playful online photo booth with camera capture, filters, photo strips, pickup, and album."
+    />
+    <meta name="theme-color" content="#d01519" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Photoautomat" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23d01519'/%3E%3Crect x='15' y='10' width='34' height='44' rx='3' fill='%23fff7ec'/%3E%3Ccircle cx='32' cy='28' r='11' fill='%23181818'/%3E%3Ccircle cx='32' cy='28' r='6' fill='%23d01519'/%3E%3Crect x='22' y='44' width='20' height='3' rx='1.5' fill='%23181818'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app" data-scene="wall">
+      <button class="back-button" id="backButton" aria-label="Back">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 18 9 12l6-6" />
+        </svg>
+      </button>
+
+      <button class="album-button" id="albumButton" aria-label="Open album">
+        <span class="album-count" id="albumCount">0</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 4h12a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Z" />
+          <path d="M7 18V6a2 2 0 0 1 2-2" />
+          <path d="M9 9h6M9 13h5" />
+        </svg>
+      </button>
+
+      <section class="photo-world" aria-label="Photoautomat world">
+        <div class="wall-set">
+          <img class="reference-wall-photo" src="assets/wall-booth.png" alt="" />
+          <button class="primary-button wall-start-button" id="startButton">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 8h4l2-3h4l2 3h4v11H4V8Z" />
+              <circle cx="12" cy="13.5" r="3.4" />
+            </svg>
+            <span>Start</span>
+          </button>
+          <div class="wall-trace" aria-hidden="true"></div>
+          <img class="poster poster-left" src="assets/wall-booth.png" alt="" />
+          <img class="poster poster-dessert" src="assets/k-dessert-poster.png" alt="" />
+          <div class="scribble left-note">NO TIME<br />FOR FANCY<br />JUST OPEN</div>
+          <div class="scribble right-note">TAKE A PHOTO<br />LEAVE MEMORY</div>
+          <div class="memo memo-left">PHOTOS<br />MEMORIES<br />GOOD COFFEE</div>
+          <div class="memo memo-right">LIFE NEEDS<br />GOOD PHOTOS</div>
+        </div>
+
+        <div class="camera-rig">
+          <div class="booth-model">
+            <div class="booth-side left-side"></div>
+            <div class="booth-side right-side">
+              <span>GOOD<br />PHOTOS<br />BETTER<br />DAYS</span>
+            </div>
+            <div class="booth-roof">
+              <span>PHOTOAUTOMAT</span>
+            </div>
+            <div class="booth-front">
+              <div class="front-panel">
+                <div class="sample-card">
+                  <strong>RETRO PHOTO</strong>
+                  <span>AUTOMAT</span>
+                  <i>3 different frames</i>
+                </div>
+                <div class="machine-slot-detail"></div>
+              </div>
+              <div class="curtain"></div>
+              <div class="machine-base"></div>
+            </div>
+
+            <div class="booth-room">
+              <div class="ceiling-light"></div>
+              <div class="side-light left"></div>
+              <div class="side-light right"></div>
+              <div class="booth-camera"></div>
+              <div class="screen">
+                <div class="flash" id="flash"></div>
+                <div class="camera-wrap">
+                  <div class="capture-frame" id="captureFrame">
+                    <video id="camera" autoplay playsinline muted></video>
+                    <canvas id="captureCanvas" hidden></canvas>
+                    <div class="camera-fallback" id="cameraFallback">
+                      <span>Camera preview</span>
+                      <small>Allow camera access to pose live.</small>
+                    </div>
+                  </div>
+                  <div class="countdown" id="countdown" aria-live="polite"></div>
+                </div>
+                <div class="raw-review" id="rawReview" hidden>
+                  <div class="raw-grid" id="rawGrid"></div>
+                  <button class="primary-button" id="finishButton">Pick Finished</button>
+                </div>
+                <div class="finished-review" id="finishedReview" hidden>
+                  <img id="screenFinishedPhoto" alt="Finished photo preview" />
+                  <p>Printing...</p>
+                </div>
+              </div>
+
+              <aside class="control-panel" id="controlPanel">
+                <div class="mode-tabs" role="tablist" aria-label="Photo options">
+                  <button class="mode-tab active" id="frameMode" type="button">Frames</button>
+                  <button class="mode-tab" id="filterMode" type="button">Filters</button>
+                </div>
+                <div class="chooser active" id="frameChooser">
+                  <button class="rail-button" id="framePrev" type="button" aria-label="Previous frame">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg>
+                  </button>
+                  <div class="option-row preview-row" id="frameOptions"></div>
+                  <button class="rail-button" id="frameNext" type="button" aria-label="Next frame">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+                  </button>
+                </div>
+                <div class="chooser" id="filterChooser">
+                  <button class="rail-button" id="filterPrev" type="button" aria-label="Previous filter">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg>
+                  </button>
+                  <div class="option-row filter-row" id="filterOptions"></div>
+                  <button class="rail-button" id="filterNext" type="button" aria-label="Next filter">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+                  </button>
+                </div>
+                <button class="shutter-button" id="shutterButton">
+                  <span id="shutterLabel">Take 1 / 3</span>
+                </button>
+                <p class="hint" id="hint">Choose a frame and filter, then take your set.</p>
+              </aside>
+            </div>
+
+            <div class="outlet-machine">
+              <div class="delivery-sign">
+                <strong>PHOTOS</strong>
+                <span>DELIVERED HERE</span>
+                <span>IN 4 MINUTES</span>
+                <b aria-hidden="true">▼</b>
+              </div>
+              <div class="slot">
+                <canvas id="finishedCanvas" width="680" height="1800"></canvas>
+              </div>
+              <button class="primary-button pickup-button" id="pickupButton">Pick Up</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="final-overlay" id="finalOverlay" aria-label="Finished photo" hidden>
+        <div class="spotlight">
+          <img id="finalPhoto" alt="Finished photo strip" />
+          <div class="save-actions">
+            <button class="primary-button" id="downloadButton">Save to Desktop</button>
+            <button class="secondary-button" id="phoneButton">Save to Phone</button>
+          </div>
+          <p id="savedNote" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <dialog class="album-dialog" id="albumDialog">
+        <form method="dialog">
+          <button class="icon-button close-button" aria-label="Close album">×</button>
+        </form>
+        <h2>Album</h2>
+        <div class="album-grid" id="albumGrid"></div>
+      </dialog>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
